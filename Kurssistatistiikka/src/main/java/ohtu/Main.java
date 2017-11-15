@@ -3,6 +3,8 @@ package ohtu;
 import com.google.gson.Gson;
 import java.io.IOException;
 import org.apache.http.client.fluent.Request;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class Main {
 
@@ -15,7 +17,7 @@ public class Main {
         }
 
         String url = "https://studies.cs.helsinki.fi/ohtustats/students/" + studentNr + "/submissions";
-        
+
         String bodyText = Request.Get(url).execute().returnContent().asString();
 
         Gson mapper = new Gson();
@@ -23,13 +25,27 @@ public class Main {
 
         String courseurl = "https://studies.cs.helsinki.fi/ohtustats/courseinfo";
         String courseinfo = Request.Get(courseurl).execute().returnContent().asString();
-        
+
         Gson courseMapper = new Gson();
         Course course = courseMapper.fromJson(courseinfo, Course.class);
-        
+
+        String statsUrl = "https://studies.cs.helsinki.fi/ohtustats/stats";
+        String statsResponse = Request.Get(statsUrl).execute().returnContent().asString();
+
+        JsonParser parser = new JsonParser();
+        JsonObject parsittuData = parser.parse(statsResponse).getAsJsonObject();
+
+        int totalSubmissions = 0;
+        int totalExercises = 0;
+        for (int i = 1; i < parsittuData.size()+1; i++) {
+            String is = i + "";
+            totalSubmissions += Integer.parseInt(parsittuData.get(is).getAsJsonObject().get("students").toString());
+            totalExercises += Integer.parseInt(parsittuData.get(is).getAsJsonObject().get("exercise_total").toString());
+        }
+
         System.out.println("Kurssi: " + course.getName() + ", " + course.getTerm());
         System.out.println("");
-        
+
         System.out.println("Opiskelijanumero: " + studentNr);
         System.out.println("");
         int exercises = 0;
@@ -43,7 +59,8 @@ public class Main {
         }
 
         System.out.println("");
-        System.out.println("yhteensä: " + exercises + ", aikaa kului " + hours + " tuntia");
+        System.out.println("Yhteensä: " + exercises + ", aikaa kului " + hours + " tuntia\n");
+        System.out.println("Kurssilla yhteensä " + totalSubmissions + " palautusta, palautettuja tehtäviä " + totalExercises + " kpl");
 
     }
 }
