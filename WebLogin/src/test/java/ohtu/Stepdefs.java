@@ -70,10 +70,10 @@ public class Stepdefs {
     public void user_is_not_created_and_error_is_reported(String errorMessage) throws Throwable {
         pageHasContent(errorMessage);
     }
-    
-        @When("^too short username \"([^\"]*)\" and valid password \"([^\"]*)\" are given$")
+
+    @When("^too short username \"([^\"]*)\" and valid password \"([^\"]*)\" are given$")
     public void too_short_username_and_valid_password_are_given(String username, String password) throws Throwable {
-            signUpWith(username, password, password);
+        signUpWith(username, password, password);
     }
 
     @When("^a valid username \"([^\"]*)\" and too short password \"([^\"]*)\" are given$")
@@ -85,11 +85,27 @@ public class Stepdefs {
     public void already_taken_username_and_valid_password_are_given(String username, String password) throws Throwable {
         signUpWith(username, password, password);
     }
-    
+
     @When("^a valid username \"([^\"]*)\" is given, but a valid password \"([^\"]*)\" do not match with password confirmation \"([^\"]*)\"$")
     public void a_valid_username_is_given_but_a_valid_password_do_not_match_with_password_confirmation(String username, String password, String confirmation) throws Throwable {
         signUpWith(username, password, confirmation);
-    }    
+    }
+
+    @Given("^user with username \"([^\"]*)\" with password \"([^\"]*)\" is successfully created$")
+    public void user_with_username_with_password_is_successfully_created(String username, String password) throws Throwable {
+        command_new_user_is_selected();
+        signUpWith(username, password, password);
+        WebElement element = driver.findElement(By.linkText("continue to application mainpage"));
+        element.click();
+        element = driver.findElement(By.linkText("logout"));
+        element.click();
+    }
+
+    @Given("^user with username \"([^\"]*)\" and password \"([^\"]*)\" is tried to be created$")
+    public void user_with_username_and_password_is_tried_to_be_created(String username, String password) throws Throwable {
+        command_new_user_is_selected();
+        signUpWith(username, password, password);
+    }
 
     @After
     public void tearDown() {
